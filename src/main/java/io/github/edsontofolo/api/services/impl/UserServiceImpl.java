@@ -7,6 +7,7 @@ import io.github.edsontofolo.api.services.exceptions.ObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,5 +20,10 @@ public class UserServiceImpl implements UserService {
     public User findById(Integer id) {
         Optional<User> opt = this.userRepository.findById(id);
         return opt.orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"));
+    }
+
+    @Override
+    public List<User> findAll() {
+        return this.userRepository.findAll();
     }
 }
