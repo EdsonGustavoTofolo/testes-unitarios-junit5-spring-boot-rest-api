@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class UserServiceImplTest {
@@ -157,7 +157,16 @@ class UserServiceImplTest {
     }
 
     @Test
-    void delete() {
+    void deleteWithSuccess() {
+        // cenario
+        when(this.userRepository.findById(ID)).thenReturn(this.optionalUser);
+        doNothing().when(this.userRepository).deleteById(ID);
+
+        // acao
+        this.service.delete(ID);
+
+        // verificacao
+        verify(this.userRepository, times(1)).deleteById(ID);
     }
 
     private void startUser() {
