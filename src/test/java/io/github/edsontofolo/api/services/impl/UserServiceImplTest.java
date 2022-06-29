@@ -113,11 +113,13 @@ class UserServiceImplTest {
     @Test
     void whenCreateThenReturnAnDataIntegrityViolationException() {
         // cenario
-        when(this.userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
+        when(this.userRepository.findByEmail(Mockito.anyString())).thenReturn(this.optionalUser);
 
         // acao
         try {
+            this.optionalUser.get().setId(2);
             this.service.create(this.userDto);
+            fail("Deveria ter lancado excecao de e-mail ja cadastrado");
         } catch (Exception ex) {
             assertEquals(DataIntegratyViolationException.class, ex.getClass());
             assertEquals("E-mail já cadastrado no sistema", ex.getMessage());
@@ -145,11 +147,13 @@ class UserServiceImplTest {
     @Test
     void whenUpdateThenReturnAnDataIntegrityViolationException() {
         // cenario
-        when(this.userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
+        when(this.userRepository.findByEmail(Mockito.anyString())).thenReturn(this.optionalUser);
 
         // acao
         try {
+            this.optionalUser.get().setId(2);
             this.service.update(this.userDto);
+            fail("Deveria ter lancado excecao de e-mail ja cadastrado");
         } catch (Exception ex) {
             assertEquals(DataIntegratyViolationException.class, ex.getClass());
             assertEquals("E-mail já cadastrado no sistema", ex.getMessage());
@@ -167,6 +171,21 @@ class UserServiceImplTest {
 
         // verificacao
         verify(this.userRepository, times(1)).deleteById(ID);
+    }
+
+    @Test
+    void deleteWithUserNotFoundException() {
+        // cenario
+        when(this.userRepository.findById(ID)).thenThrow(new ObjectNotFoundException("Usuário não encontrado"));
+
+        // acao/verificacao
+        try {
+            this.service.delete(ID);
+            fail("Deveria ter lancado excecao de Usuario nao encontrado");
+        } catch (Exception exception) {
+            assertEquals(ObjectNotFoundException.class, exception.getClass());
+            assertEquals("Usuário não encontrado", exception.getMessage());
+        }
     }
 
     private void startUser() {
