@@ -3,6 +3,7 @@ package io.github.edsontofolo.api.services.impl;
 import io.github.edsontofolo.api.domain.User;
 import io.github.edsontofolo.api.domain.dto.UserDto;
 import io.github.edsontofolo.api.repositories.UserRepository;
+import io.github.edsontofolo.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,8 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -54,6 +54,21 @@ class UserServiceImplTest {
         assertEquals(ID, response.getId());
         assertEquals(NAME, response.getName());
         assertEquals(EMAIL, response.getEmail());
+    }
+
+    @Test
+    void whenFindByIdThenReturnAnObjectNotFoundException() {
+        // cenario
+        when(this.userRepository.findById(ID)).thenThrow(new ObjectNotFoundException("Usuário não encontrado"));
+
+        // acao
+        try {
+            this.service.findById(ID);
+            fail("Deveria ter lancado excecao ObjectNotFound");
+        } catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals("Usuário não encontrado", ex.getMessage());
+        }
     }
 
     @Test
