@@ -16,10 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserResource {
 
+    public static final String ID = "/{id}";
     private final UserService userService;
     private final ModelMapper mapper;
 
-    @GetMapping("/{id}")
+    @GetMapping(ID)
     public ResponseEntity<UserDto> findById(@PathVariable Integer id) {
         var user = this.userService.findById(id);
         var userDto = this.mapper.map(user, UserDto.class);
@@ -38,17 +39,23 @@ public class UserResource {
         var user = this.userService.create(userDto);
         var userSavedDto = this.mapper.map(user, UserDto.class);
 
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(userSavedDto.getId()).toUri();
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path(ID).buildAndExpand(userSavedDto.getId()).toUri();
 
         return ResponseEntity.created(uri).body(userSavedDto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(ID)
     public ResponseEntity<UserDto> update(@PathVariable Integer id, @RequestBody UserDto userDto) {
         userDto.setId(id);
         var user = this.userService.update(userDto);
         var userUpdatedDto = this.mapper.map(user, UserDto.class);
 
         return ResponseEntity.ok(userUpdatedDto);
+    }
+
+    @DeleteMapping(ID)
+    public ResponseEntity<UserDto> delete(@PathVariable Integer id) {
+        this.userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

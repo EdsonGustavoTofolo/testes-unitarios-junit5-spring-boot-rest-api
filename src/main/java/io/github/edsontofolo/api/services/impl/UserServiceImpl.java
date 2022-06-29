@@ -45,6 +45,12 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.save(user);
     }
 
+    @Override
+    public void delete(Integer id) {
+        var user = this.findById(id);
+        this.userRepository.deleteById(user.getId());
+    }
+
     private void checkIfEmailAlreadyExists(UserDto userDto) {
         var opt = this.userRepository.findByEmail(userDto.getEmail());
         if (opt.isPresent() && !opt.get().getId().equals(userDto.getId())) {
