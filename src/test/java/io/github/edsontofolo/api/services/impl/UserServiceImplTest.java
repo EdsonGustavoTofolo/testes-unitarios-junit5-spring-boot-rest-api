@@ -3,6 +3,7 @@ package io.github.edsontofolo.api.services.impl;
 import io.github.edsontofolo.api.domain.User;
 import io.github.edsontofolo.api.domain.dto.UserDto;
 import io.github.edsontofolo.api.repositories.UserRepository;
+import io.github.edsontofolo.api.services.exceptions.DataIntegratyViolationException;
 import io.github.edsontofolo.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -107,6 +108,20 @@ class UserServiceImplTest {
         assertEquals(NAME, createdUser.getName());
         assertEquals(EMAIL, createdUser.getEmail());
         assertEquals(PASSWORD, createdUser.getPassword());
+    }
+
+    @Test
+    void whenCreateThenReturnAnDataIntegrityViolationException() {
+        // cenario
+        when(this.userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
+
+        // acao
+        try {
+            this.service.create(this.userDto);
+        } catch (Exception ex) {
+            assertEquals(DataIntegratyViolationException.class, ex.getClass());
+            assertEquals("E-mail já cadastrado no sistema", ex.getMessage());
+        }
     }
 
     @Test
