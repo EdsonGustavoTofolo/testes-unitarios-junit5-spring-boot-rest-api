@@ -4,6 +4,7 @@ import io.github.edsontofolo.api.domain.User;
 import io.github.edsontofolo.api.domain.dto.UserDto;
 import io.github.edsontofolo.api.repositories.UserRepository;
 import io.github.edsontofolo.api.services.UserService;
+import io.github.edsontofolo.api.services.exceptions.DataIntegratyViolationException;
 import io.github.edsontofolo.api.services.exceptions.ObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,7 +33,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(UserDto userDto) {
+        this.checkIfEmailAlreadyExists(userDto);
         var user = this.mapper.map(userDto, User.class);
         return this.userRepository.save(user);
+    }
+
+    private void checkIfEmailAlreadyExists(UserDto userDto) {
+        var opt = this.userRepository.findByEmail(userDto.getEmail());
+        if (opt.isPresent()) {
+            throw new DataIntegratyViolationException("E-mail já cadastrado no sistema");
+        }
+
     }
 }
