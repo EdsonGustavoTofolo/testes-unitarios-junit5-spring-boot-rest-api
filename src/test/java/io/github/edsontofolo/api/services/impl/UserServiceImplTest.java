@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -78,7 +79,7 @@ class UserServiceImplTest {
         when(this.userRepository.findAll()).thenReturn(List.of(this.user));
 
         // acao
-        List<User> users = this.service.findAll();
+        var users = this.service.findAll();
 
         // verificacao
         assertNotNull(users);
@@ -91,7 +92,21 @@ class UserServiceImplTest {
     }
 
     @Test
-    void create() {
+    void whenCreateThenReturnSuccess() {
+        // cenario
+        when(this.userRepository.save(Mockito.any(User.class))).thenReturn(this.user);
+        when(this.mapper.map(this.userDto, User.class)).thenReturn(this.user);
+
+        // acao
+        var createdUser = this.service.create(this.userDto);
+
+        // verificacao
+        assertNotNull(createdUser);
+        assertEquals(User.class, createdUser.getClass());
+        assertEquals(ID, createdUser.getId());
+        assertEquals(NAME, createdUser.getName());
+        assertEquals(EMAIL, createdUser.getEmail());
+        assertEquals(PASSWORD, createdUser.getPassword());
     }
 
     @Test
