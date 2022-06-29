@@ -125,7 +125,35 @@ class UserServiceImplTest {
     }
 
     @Test
-    void update() {
+    void whenUpdateThenReturnSuccess() {
+        // cenario
+        when(this.userRepository.save(Mockito.any(User.class))).thenReturn(this.user);
+        when(this.mapper.map(this.userDto, User.class)).thenReturn(this.user);
+
+        // acao
+        var updatedUser = this.service.update(this.userDto);
+
+        // verificacao
+        assertNotNull(updatedUser);
+        assertEquals(User.class, updatedUser.getClass());
+        assertEquals(ID, updatedUser.getId());
+        assertEquals(NAME, updatedUser.getName());
+        assertEquals(EMAIL, updatedUser.getEmail());
+        assertEquals(PASSWORD, updatedUser.getPassword());
+    }
+
+    @Test
+    void whenUpdateThenReturnAnDataIntegrityViolationException() {
+        // cenario
+        when(this.userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
+
+        // acao
+        try {
+            this.service.update(this.userDto);
+        } catch (Exception ex) {
+            assertEquals(DataIntegratyViolationException.class, ex.getClass());
+            assertEquals("E-mail já cadastrado no sistema", ex.getMessage());
+        }
     }
 
     @Test
