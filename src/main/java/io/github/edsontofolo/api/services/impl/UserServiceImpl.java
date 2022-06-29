@@ -38,9 +38,16 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.save(user);
     }
 
+    @Override
+    public User update(UserDto userDto) {
+        this.checkIfEmailAlreadyExists(userDto);
+        var user = this.mapper.map(userDto, User.class);
+        return this.userRepository.save(user);
+    }
+
     private void checkIfEmailAlreadyExists(UserDto userDto) {
         var opt = this.userRepository.findByEmail(userDto.getEmail());
-        if (opt.isPresent()) {
+        if (opt.isPresent() && !opt.get().getId().equals(userDto.getId())) {
             throw new DataIntegratyViolationException("E-mail já cadastrado no sistema");
         }
 
